@@ -1,0 +1,9 @@
+<!DOCTYPE kpartgui>
+<kpartplugin name="bookmarkpp" library="bookmarkpp" version="2">
+<MenuBar>
+ <Menu name="bookmarkpp"><Text>Bookmark++</Text>
+    <Action name="tools_insert_timedate"/>
+    <Action name="tools_set_bookmark" />
+ </Menu>
+</MenuBar>
+</kpartplugin>
