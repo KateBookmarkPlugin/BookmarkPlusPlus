@@ -9,10 +9,11 @@
 #include <ktexteditor/markinterface.h>
 #include <kxmlguiclient.h>
 #include <klocalizedstring.h>
- 
+#include <ktexteditor/sessionconfiginterface.h>
 #include <QtCore/QEvent>
 #include <QtCore/QObject>
 #include <QtCore/QList>
+#include <KConfigGroup>
  
 /**
   * This is the plugin class. There will be only one instance of this class.
@@ -22,6 +23,7 @@ class BookmarkMap;
 class BookmarkPlusPlus
   : public KTextEditor::Plugin
 {
+  Q_OBJECT
   public:
     // Constructor
     explicit BookmarkPlusPlus(QObject *parent,
@@ -81,6 +83,7 @@ public:
   void addBookmark(KTextEditor::Document* doc,QString name,int line);
   void removeBookmark(KTextEditor::Document* doc,QString name);
   void refresh(KTextEditor::Document* doc);
+  void serialize(KTextEditor::Document* doc);
   int getLineInDocument(KTextEditor::Document* doc,uint code);
   int getLineInDocument(KTextEditor::Document* doc,QString name);
   QList<QString> getBookmarkNames(KTextEditor::Document *doc);
@@ -192,6 +195,22 @@ public:
     QList<QString> getBookmarkNames()
     {
       return m_map.keys();
+    }
+    void serialize()
+    {
+      
+      QString serializationString("");
+      foreach(QString s,m_map.keys())
+      {
+        qDebug()<<"neki text";
+        serializationString+=QString(s)+QString(" ")+QString::number(m_map[s])+QString(" ");
+        qDebug()<<serializationString;
+      }
+      
+      QTextStream qout(stdout);
+      qout<<"\nbookmarkci:"<<serializationString<<"x\n";
+      qobject_cast<KTextEditor::MarkInterface*>(m_doc)->setMarkDescription(
+      KTextEditor::MarkInterface::markType21,QString("djokica"));
     }
   private:
     KTextEditor::Document * m_doc;

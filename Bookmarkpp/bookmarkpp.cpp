@@ -57,6 +57,7 @@ BookmarkPlusPlus::~BookmarkPlusPlus()
 // Create the plugin view class and add it to the views list
 void BookmarkPlusPlus::addView(KTextEditor::View *view)
 {
+  qDebug()<<"dodat je view za dokument:"<<view->document()->documentName()<<"\n";
     BookmarkPlusPlusView *nview = new BookmarkPlusPlusView(view,m_bookmarks);
     m_views.append(nview);
 }
@@ -78,14 +79,16 @@ void BookmarkPlusPlus::removeView(KTextEditor::View *view)
 // Add the document to documents
 void BookmarkPlusPlus::addDocument(KTextEditor::Document *doc)
 {
+  qDebug()<<"otvaram dokument: "<<doc->documentName()<<"\n";
     m_bookmarks->addDocument(doc);
     m_docs.append(doc);
+    readConfig();
 }
  
 // Remove a document from documents list
 void BookmarkPlusPlus::removeDocument(KTextEditor::Document *doc)
 {
-  
+    writeConfig();
     m_bookmarks->removeDocument(doc);
     for (int z = 0; z < m_docs.size(); z++)
     {
@@ -96,16 +99,20 @@ void BookmarkPlusPlus::removeDocument(KTextEditor::Document *doc)
     }
 }
 
-
-// We do nothing on this methods since our plugin is not configurable yet
 void BookmarkPlusPlus::readConfig()
 {
+  qDebug()<<"\nreadConfig je pozvan\n";
+  KConfigGroup cg(KGlobal::config(), "BookmarkPlusPlus");
+  qDebug()<<"pri upisu:"<<cg.readEntry("string", QString("Default"));
 }
- 
+
 void BookmarkPlusPlus::writeConfig()
 {
+  qDebug()<<"\nwriteConfig je pozvan\n";
+  KConfigGroup cg(KGlobal::config(), "BookmarkPlusPlus" );
+  cg.writeEntry("string", QString("abecede") );
 }
- 
+
 // Plugin view class
 BookmarkPlusPlusView::BookmarkPlusPlusView(KTextEditor::View *view,BookmarkMap* books)
   : QObject(view)
@@ -115,7 +122,7 @@ BookmarkPlusPlusView::BookmarkPlusPlusView(KTextEditor::View *view,BookmarkMap* 
 {
     setComponentData(BookmarkPlusPlusFactory::componentData());
  
-    KAction *action = new KAction(i18n("Insert Time && Date"), this);
+    KAction *action = new KAction(i18n("Dummyyyyy"), this);
     // Here we need as first parameter the same we declared at the resource
     // contents file (timedateui.rc). We named the action "tools_insert_timedate".
     // Here is where we connect it to an actual KDE action.
@@ -157,7 +164,7 @@ void BookmarkPlusPlusView::slotSetBookmark()
   m_books->addBookmark(m_view->document(),text,
                        m_view->cursorPosition().line()
            );
-  /*
+  
   KTextEditor::MarkInterface* mi=qobject_cast
       <KTextEditor::MarkInterface*>(m_view->document());
   int mark=mi->mark( m_view->cursorPosition().line());
@@ -165,19 +172,24 @@ void BookmarkPlusPlusView::slotSetBookmark()
     mi->addMark(m_view->cursorPosition().line(),
                 KTextEditor::MarkInterface::markType01|
                 KTextEditor::MarkInterface::markType15);
-  */
+    m_books->serialize(m_view->document());
+  
   
 }
 // The slot that will be called when the menu element "Insert Time & Date" is
 // clicked.
 void BookmarkPlusPlusView::slotInsertTimeDate()
 {
-  
+    
     m_books->refresh(m_view->document());
 //     std::cout<<typeid(m_view->document()).name()<<std::endl;
 //     KTextEditor::MarkInterface* mi=qobject_cast
 //       <KTextEditor::MarkInterface*>(m_view->document());
     QTextStream qout(stdout);
+    qout<<"\n\nmarkdescription\n";
+    KTextEditor::MarkInterface* marki= qobject_cast<KTextEditor::MarkInterface*>
+    (m_view->document());
+    qout<<marki->markDescription( KTextEditor::MarkInterface::markType21)<<"\n\n";
 //     foreach(KTextEditor::Mark* a,mi->marks())
 //     {
 //       qout<<a->line<<" "<<a->type<<"\n";
@@ -204,10 +216,12 @@ BookmarkMap::~BookmarkMap()
 void BookmarkMap::addDocument(KTextEditor::Document* doc)
 {
   m_docmap[doc]=new DocBookmarkMap(doc);
+  
 }
 void BookmarkMap::removeDocument(KTextEditor::Document* doc)
 {
   m_docmap.remove(doc);
+  std::cout<<"zatvaram dokument"<<std::endl;    
 }
 //TODO:ima description u MarkInterface
 void BookmarkMap::addBookmark(KTextEditor::Document* doc,QString name,int line)
@@ -239,6 +253,11 @@ int BookmarkMap::getLineInDocument(KTextEditor::Document* doc,QString name)
 QList<QString> BookmarkMap::getBookmarkNames(KTextEditor::Document* doc)
 {
   return m_docmap[doc]->getBookmarkNames();
+}
+
+void BookmarkMap::serialize(KTextEditor::Document* doc)
+{
+  m_docmap[doc]->serialize();
 }
 // We need to include the moc file since we have declared slots and we are using
 // the Q_OBJECT macro on the BookmarkPlusPlusView class.

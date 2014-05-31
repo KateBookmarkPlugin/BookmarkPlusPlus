@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 X-KDE-Library=bookmarkpp
-X-KDE-PluginInfo-Author=Konqui the Dragon
+X-KDE-PluginInfo-Author=MAN
 X-KDE-PluginInfo-Email=konqui@kde.org
 X-KDE-PluginInfo-Name=bookmarkpp
 X-KDE-PluginInfo-Version=0.1
@@ -13,5 +13,5 @@ X-KDE-Version=4.0
 ServiceTypes=KTextEditor/Plugin
 Type=Service
 Icon=korganizer
-Name=Time & Date
-Comment=Insert current Time & Date
+Name=Bookmark++
+Comment=Named bookmarks
