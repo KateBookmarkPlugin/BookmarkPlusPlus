@@ -43,8 +43,8 @@ class BookmarkPlusPlus
  
     void addDocument(KTextEditor::Document* doc);
     void removeDocument(KTextEditor::Document* doc);
-    void readConfig();
-    void writeConfig();
+    void readConfig(KTextEditor::Document* doc);
+    void writeConfig(KTextEditor::Document* doc);
     
  
   private:
@@ -196,7 +196,7 @@ public:
     {
       return m_map.keys();
     }
-    void serialize()
+    QString serialize()
     {
       
       QString serializationString("");
@@ -211,6 +211,7 @@ public:
       qout<<"\nbookmarkci:"<<serializationString<<"x\n";
       qobject_cast<KTextEditor::MarkInterface*>(m_doc)->setMarkDescription(
       KTextEditor::MarkInterface::markType21,QString("djokica"));
+      return serializationString;
     }
   private:
     KTextEditor::Document * m_doc;

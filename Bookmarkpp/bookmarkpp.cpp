@@ -82,13 +82,13 @@ void BookmarkPlusPlus::addDocument(KTextEditor::Document *doc)
   qDebug()<<"otvaram dokument: "<<doc->documentName()<<"\n";
     m_bookmarks->addDocument(doc);
     m_docs.append(doc);
-    readConfig();
+    readConfig(doc);
 }
  
 // Remove a document from documents list
 void BookmarkPlusPlus::removeDocument(KTextEditor::Document *doc)
 {
-    writeConfig();
+    writeConfig(doc);
     m_bookmarks->removeDocument(doc);
     for (int z = 0; z < m_docs.size(); z++)
     {
@@ -99,18 +99,18 @@ void BookmarkPlusPlus::removeDocument(KTextEditor::Document *doc)
     }
 }
 
-void BookmarkPlusPlus::readConfig()
+void BookmarkPlusPlus::readConfig(KTextEditor::Document* doc)
 {
   qDebug()<<"\nreadConfig je pozvan\n";
   KConfigGroup cg(KGlobal::config(), "BookmarkPlusPlus");
-  qDebug()<<"pri upisu:"<<cg.readEntry("string", QString("Default"));
+  qDebug()<<"readEntry:"<<cg.readEntry(doc->documentName(), QString("Default"));
 }
 
-void BookmarkPlusPlus::writeConfig()
+void BookmarkPlusPlus::writeConfig(KTextEditor::Document* doc)
 {
   qDebug()<<"\nwriteConfig je pozvan\n";
   KConfigGroup cg(KGlobal::config(), "BookmarkPlusPlus" );
-  cg.writeEntry("string", QString("abecede") );
+  cg.writeEntry(doc->documentName(), m_bookmarks->m_docmap[doc]->serialize() );
 }
 
 // Plugin view class
@@ -164,15 +164,6 @@ void BookmarkPlusPlusView::slotSetBookmark()
   m_books->addBookmark(m_view->document(),text,
                        m_view->cursorPosition().line()
            );
-  
-  KTextEditor::MarkInterface* mi=qobject_cast
-      <KTextEditor::MarkInterface*>(m_view->document());
-  int mark=mi->mark( m_view->cursorPosition().line());
-  if(!mark)
-    mi->addMark(m_view->cursorPosition().line(),
-                KTextEditor::MarkInterface::markType01|
-                KTextEditor::MarkInterface::markType15);
-    m_books->serialize(m_view->document());
   
   
 }
