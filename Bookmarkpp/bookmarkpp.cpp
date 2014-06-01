@@ -57,7 +57,7 @@ BookmarkPlusPlus::~BookmarkPlusPlus()
 // Create the plugin view class and add it to the views list
 void BookmarkPlusPlus::addView(KTextEditor::View *view)
 {
-  qDebug()<<"dodat je view za dokument:"<<view->document()->documentName()<<"\n";
+  qDebug()<<"dodat je view za dokument:"<<view->document()->url()<<"\n";
     BookmarkPlusPlusView *nview = new BookmarkPlusPlusView(view,m_bookmarks);
     m_views.append(nview);
 }
@@ -79,7 +79,7 @@ void BookmarkPlusPlus::removeView(KTextEditor::View *view)
 // Add the document to documents
 void BookmarkPlusPlus::addDocument(KTextEditor::Document *doc)
 {
-  qDebug()<<"otvaram dokument: "<<doc->documentName()<<"\n";
+  qDebug()<<"otvaram dokument: "<<doc->documentName()<<" "<<doc->url()<<"\n";
     m_bookmarks->addDocument(doc);
     m_docs.append(doc);
     readConfig(doc);
@@ -103,14 +103,14 @@ void BookmarkPlusPlus::readConfig(KTextEditor::Document* doc)
 {
   qDebug()<<"\nreadConfig je pozvan\n";
   KConfigGroup cg(KGlobal::config(), "BookmarkPlusPlus");
-  qDebug()<<"readEntry:"<<cg.readEntry(doc->documentName(), QString("Default"));
+  qDebug()<<"readEntry:"<<cg.readEntry(doc->url().prettyUrl(), QString("Default"));
 }
 
 void BookmarkPlusPlus::writeConfig(KTextEditor::Document* doc)
 {
   qDebug()<<"\nwriteConfig je pozvan\n";
   KConfigGroup cg(KGlobal::config(), "BookmarkPlusPlus" );
-  cg.writeEntry(doc->documentName(), m_bookmarks->m_docmap[doc]->serialize() );
+  cg.writeEntry(doc->url().prettyUrl(), m_bookmarks->m_docmap[doc]->serialize() );
 }
 
 // Plugin view class
