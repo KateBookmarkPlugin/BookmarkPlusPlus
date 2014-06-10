@@ -103,14 +103,28 @@ void BookmarkPlusPlus::readConfig(KTextEditor::Document* doc)
 {
   qDebug()<<"\nreadConfig je pozvan\n";
   KConfigGroup cg(KGlobal::config(), "BookmarkPlusPlus");
-  qDebug()<<"readEntry:"<<cg.readEntry(doc->url().prettyUrl(), QString("Default"));
+  QVariantList serializedData=cg.readEntry(doc->url().prettyUrl(), QVariantList());
+  if(serializedData.isEmpty())
+  {
+    //TODO sta ako nema
+    qDebug()<<"ne valja upis ili nema";
+    return;
+  }
+  QList<QVariant>::iterator iter=serializedData.begin();
+  QList<QVariant>::iterator end=serializedData.end();
+  for(;iter!=end;iter++)
+  {
+    qDebug()<<"\nstampam:"<<*iter;
+  }
+  
 }
 
 void BookmarkPlusPlus::writeConfig(KTextEditor::Document* doc)
 {
   qDebug()<<"\nwriteConfig je pozvan\n";
   KConfigGroup cg(KGlobal::config(), "BookmarkPlusPlus" );
-  cg.writeEntry(doc->url().prettyUrl(), m_bookmarks->m_docmap[doc]->serialize() );
+  cg.writeEntry
+  (doc->url().prettyUrl(), *(m_bookmarks->m_docmap[doc]->serialize()));
 }
 
 // Plugin view class
@@ -196,59 +210,6 @@ void BookmarkPlusPlusView::slotInsertTimeDate()
     //QString stringa=QString(std::string(n,'*'));
     //std::cout<<n<<std::endl;
     //m_view->document()->insertText(m_view->cursorPosition(), stringa);
-}
-
-BookmarkMap::BookmarkMap()
-{
-}
-BookmarkMap::~BookmarkMap()
-{
-}
-void BookmarkMap::addDocument(KTextEditor::Document* doc)
-{
-  m_docmap[doc]=new DocBookmarkMap(doc);
-  
-}
-void BookmarkMap::removeDocument(KTextEditor::Document* doc)
-{
-  m_docmap.remove(doc);
-  std::cout<<"zatvaram dokument"<<std::endl;    
-}
-//TODO:ima description u MarkInterface
-void BookmarkMap::addBookmark(KTextEditor::Document* doc,QString name,int line)
-{
-  m_docmap[doc]->addBookmark(name,line);
-}
-void BookmarkMap::removeBookmark(KTextEditor::Document* doc,QString name)
-{
-  m_docmap[doc]->removeBookmark(name);
-}
-//optional TODO: da ima opcija u config da li da moze da se brise bookmark sa
-// ctrl+B ili samo sa nekom nasom skracenicom za brisanje bookmarka
-void BookmarkMap::refresh(KTextEditor::Document *doc)
-{
-  m_docmap[doc]->refresh();
-}
-//return: -1 if a code doesn exist, line of named bookmark if it exists 
-int BookmarkMap::getLineInDocument(KTextEditor::Document* doc,uint code)
-{
-  return m_docmap[doc]->getLineOfBookmark(code);
-}
-//return: -2 if a name doesn't exist, -1 if a name exist, but bookmark doesn't
-//or line of named bookmark if it exists
-int BookmarkMap::getLineInDocument(KTextEditor::Document* doc,QString name)
-{
-  return m_docmap[doc]->getLineOfBookmark(name);
-}
-
-QList<QString> BookmarkMap::getBookmarkNames(KTextEditor::Document* doc)
-{
-  return m_docmap[doc]->getBookmarkNames();
-}
-
-void BookmarkMap::serialize(KTextEditor::Document* doc)
-{
-  m_docmap[doc]->serialize();
 }
 // We need to include the moc file since we have declared slots and we are using
 // the Q_OBJECT macro on the BookmarkPlusPlusView class.

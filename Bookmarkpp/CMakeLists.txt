@@ -4,7 +4,7 @@ include_directories(${KDE4_INCLUDES})
  
 # We are calling our plugin "ktexteditor_timedate", and it contains only
 # one source file: timedate.cpp.
-kde4_add_plugin(bookmarkpp bookmarkpp.cpp)
+kde4_add_plugin(bookmarkpp bookmarkpp.cpp BookmarkMap.cpp)
  
 # We need to link our plugin against kdecore libs, as well as ktexteditor
 target_link_libraries(bookmarkpp ${KDE4_KDECORE_LIBS} ${KDE4_KDEUI_LIBS} ktexteditor)
